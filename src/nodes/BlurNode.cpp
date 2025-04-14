@@ -6,18 +6,15 @@
 
 #define PI 3.14159265358979323846
 
-// Constructor to initialize the node with a name
 BlurNode::BlurNode(const std::string& name) {
     this->name = name;
     this->id = "blur_" + name;
 }
 
-// Set the input image
 void BlurNode::setInput(const cv::Mat& input) {
     inputImage = input;
 }
 
-// Function to generate a directional blur kernel
 cv::Mat BlurNode::generateDirectionalKernel(int radius, float angleDegrees) {
     int size = radius * 2 + 1;
     cv::Mat kernel = cv::Mat::zeros(size, size, CV_32F);
@@ -48,12 +45,10 @@ cv::Mat BlurNode::generateDirectionalKernel(int radius, float angleDegrees) {
     return kernel;
 }
 
-// Function to generate a Gaussian blur kernel
 cv::Mat BlurNode::generateGaussianKernel(int radius) {
     int size = 2 * radius + 1;
     cv::Mat kernel(size, size, CV_32F);
 
-    // Generate Gaussian kernel
     float sigma = radius / 3.0f;
     float sum = 0.0f;
     for (int y = -radius; y <= radius; y++) {
@@ -63,12 +58,10 @@ cv::Mat BlurNode::generateGaussianKernel(int radius) {
         }
     }
 
-    // Normalize the kernel
     kernel /= sum;
     return kernel;
 }
 
-// Apply the blur effect (either directional or Gaussian)
 void BlurNode::process() {
     if (inputImage.empty()) {
         std::cerr << "No input image for BlurNode: " << name << std::endl;
@@ -77,16 +70,13 @@ void BlurNode::process() {
 
     cv::Mat kernel;
     if (directional) {
-        // Apply directional blur (45 degrees by default)
         kernel = generateDirectionalKernel(radius, angle);
         std::cout << "Generated Directional Kernel." << std::endl;
     } else {
-        // Apply Gaussian blur (uniform)
         kernel = generateGaussianKernel(radius);
         std::cout << "Generated Gaussian Kernel." << std::endl;
     }
 
-    // Apply the blur using filter2D
     cv::filter2D(inputImage, outputImage, -1, kernel);
 
     if (outputImage.empty()) {
@@ -96,42 +86,35 @@ void BlurNode::process() {
     }
 }
 
-// Render the UI with sliders and kernel preview
 void BlurNode::renderUI() {
     std::cout << "[BlurNode: " << name << "]" << std::endl;
 
-    // Slider for blur radius
     if (ImGui::SliderInt("Radius", &radius, 1, 20)) {
-        process();  // Re-process the image when radius changes
+        process();
     }
 
-    // Checkbox for directional or uniform blur
     if (ImGui::Checkbox("Directional Blur", &directional)) {
-        process();  // Re-process the image when blur type changes
+        process();
     }
 
-    // Preview the kernel
-    cv::Mat kernelPreview = generateGaussianKernel(radius);  // Preview Gaussian kernel
+    cv::Mat kernelPreview = generateGaussianKernel(radius);
     if (directional) {
-        kernelPreview = generateDirectionalKernel(radius, 45.0f);  // Preview Directional kernel
+        kernelPreview = generateDirectionalKernel(radius, 45.0f);
     }
 
-    // Display the kernel matrix using OpenCV's imshow
     if (!kernelPreview.empty()) {
-        cv::imshow("Kernel Preview", kernelPreview);  // Display the kernel preview for educational purposes
+        cv::imshow("Kernel Preview", kernelPreview);
         cv::waitKey(0);
     }
 }
 
-// Get the output image
 cv::Mat BlurNode::getOutput() const {
     return outputImage;
 }
 
-// Set blur radius
 void BlurNode::setRadius(int newRadius) {
     radius = newRadius;
-    process();  // Re-process the image with the new radius
+    process();
 }
 
 void BlurNode::setAngle(float newAngle) {
@@ -139,8 +122,7 @@ void BlurNode::setAngle(float newAngle) {
     process();
 }
 
-// Set whether blur is directional or uniform
 void BlurNode::setDirectional(bool isDirectional) {
     directional = isDirectional;
-    process();  // Re-process the image with the new blur type
+    process();
 }

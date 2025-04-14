@@ -5,7 +5,6 @@
 
 class ColorChannelSplitterNode : public Node {
 public:
-    // Constructor accepting a name and whether to output grayscale
     ColorChannelSplitterNode(const std::string& name, bool outputGrayscale = false);
 
     void setInput(const cv::Mat& input) override;
@@ -14,13 +13,12 @@ public:
     cv::Mat getOutput() const override;
     cv::Mat mergeChannels();
 
-    // Set whether to output grayscale representations of each channel
     void setOutputGrayscale(bool enable);
     void resetParams();
-    cv::Mat inputImage;  // Input image
+    cv::Mat inputImage; 
     cv::Mat redChannel;
     cv::Mat greenChannel;
     cv::Mat blueChannel;
-    cv::Mat alphaChannel;  // Only for RGBA images
-    bool outputGrayscale;  // Flag to control grayscale output
+    cv::Mat alphaChannel;  
+    bool outputGrayscale; 
 };

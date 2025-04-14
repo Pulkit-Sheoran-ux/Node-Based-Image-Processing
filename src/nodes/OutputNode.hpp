@@ -3,14 +3,14 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <memory>
-#include "../graph/Node.hpp"  // Correct path to Node.hpp
+#include "../graph/Node.hpp" 
 
 class OutputNode : public Node {
 private:
     cv::Mat inputImage;
     std::string savePath;
     std::string type;
-    int quality;  // Optional, for image quality (e.g., JPEG quality)
+    int quality;  
 
 public:
     OutputNode(const std::string& name, const std::string& path, const std::string& type, int quality = 95);
