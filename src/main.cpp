@@ -7,6 +7,8 @@
 #include "nodes/BlurNode.hpp"
 #include "nodes/ThresholdNode.hpp"
 #include "nodes/EdgeDetectionNode.hpp"
+#include "nodes/BlendNode.hpp"
+#include "nodes/NoiseGenerationNode.hpp"
 #include <iostream>
 #include <imgui.h>
 
@@ -20,6 +22,8 @@ void mergeChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode);
 void applyBlur(std::shared_ptr<BlurNode> &blurNode, std::shared_ptr<ImageInputNode> &inputNode);
 void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, std::shared_ptr<ImageInputNode> &inputNode);
 void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::shared_ptr<ImageInputNode> &inputNode);
+void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInputNode> &inputNode);
+void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode);
 
 int main()
 {
@@ -32,6 +36,8 @@ int main()
     auto blurNode = std::make_shared<BlurNode>("GaussianBlur");
     auto thresholdNode = std::make_shared<ThresholdNode>("ThresholdNode");
     auto edgedetectionNode = std::make_shared<EdgeDetectionNode>("EdgeDetection");
+    auto blendNode = std::make_shared<BlendNode>("Blend");
+    auto noiseNode = std::make_shared<NoiseGeneratorNode>("NoiseID","NoiseGenerator");
 
     graph.addNode(inputNode);
     graph.addNode(splitterNode);
@@ -40,6 +46,8 @@ int main()
     graph.addNode(blurNode);
     graph.addNode(thresholdNode);
     graph.addNode(edgedetectionNode);
+    graph.addNode(blendNode);
+    graph.addNode(noiseNode);
 
     int choice = 0;
     bool imageLoaded = false;
@@ -48,7 +56,7 @@ int main()
     while (true)
     {
         showMenu();
-        std::cout << "Enter your choice (1-10): ";
+        std::cout << "Enter your choice (1-12): ";
         std::cin >> choice;
 
         switch (choice)
@@ -81,6 +89,12 @@ int main()
             applyEdgeDetection(edgedetectionNode, inputNode);
             break;
         case 10:
+            applyBlend(blendNode, inputNode);
+            break;
+        case 11:
+            applyNoise(noiseNode);
+            break;
+        case 12:
             std::cout << "Exiting program." << std::endl;
             return 0;
         default:
@@ -103,7 +117,9 @@ void showMenu()
     std::cout << "7. Apply Blur to Image" << std::endl;
     std::cout << "8. Apply Thresholding" << std::endl;
     std::cout << "9. Edge Detection" << std::endl;
-    std::cout << "10. Exit" << std::endl;
+    std::cout << "10. Blend Images" << std::endl;
+    std::cout << "11. Generate Noise" << std::endl;
+    std::cout << "12. Exit" << std::endl;
 }
 
 void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded)
@@ -345,5 +361,153 @@ void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::share
     else
     {
         std::cout << "Edge detection failed. The output image is empty." << std::endl;
+    }
+}
+
+void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInputNode> &inputNode)
+{
+    std::string secondImageName;
+    std::cout << "Enter filename of second image (in ../assets/): ";
+    std::cin >> secondImageName;
+
+    std::shared_ptr<ImageInputNode> secondInput = std::make_shared<ImageInputNode>("SecondImage", "../assets/" + secondImageName);
+    secondInput->process();
+
+    blendNode->setInputA(inputNode->getOutput());
+    blendNode->setInputB(secondInput->getOutput());
+
+    std::string blendMode;
+    std::cout << "Enter blend mode (normal/multiply/screen/overlay/difference): ";
+    std::cin >> blendMode;
+    if (blendMode == "normal")
+    {
+        blendNode->setBlendMode(BlendNode::NORMAL);
+    }
+    if (blendMode == "multiply")
+    {
+        blendNode->setBlendMode(BlendNode::MULTIPLY);
+    }
+    if (blendMode == "screen")
+    {
+        blendNode->setBlendMode(BlendNode::SCREEN);
+    }
+    if (blendMode == "overlay")
+    {
+        blendNode->setBlendMode(BlendNode::OVERLAY);
+    }
+    if (blendMode == "diffrence")
+    {
+        blendNode->setBlendMode(BlendNode::DIFFERENCE);
+    }
+
+    float opacity;
+    std::cout << "Enter mix/opacity (0.0 - 1.0): ";
+    std::cin >> opacity;
+    blendNode->setOpacity(opacity);
+
+    blendNode->process();
+
+    cv::Mat blendedImage = blendNode->getOutput();
+    if (!blendedImage.empty())
+    {
+        cv::imwrite("Blended_Image.png", blendedImage);
+        std::cout << "Blended image saved as Blended_Image.png" << std::endl;
+        cv::imshow("Blended Image", blendedImage);
+        cv::waitKey(0);
+    }
+    else
+    {
+        std::cout << "Failed to blend images" << std::endl;
+    }
+}
+
+void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode) {
+    std::string type;
+    int scale, octaves;
+    float persistence;
+
+    while (true) {
+        std::cout << "Enter Noise Type (perlin/simplex/worley): ";
+        std::cin >> type;
+        if (type == "perlin") {
+            noiseNode->setNoiseType(NoiseGeneratorNode::NoiseType::Perlin);
+            break;
+        } 
+        else if (type == "simplex") {
+            noiseNode->setNoiseType(NoiseGeneratorNode::NoiseType::Simplex);
+            break;
+        } 
+        else if (type == "worley") {
+            noiseNode->setNoiseType(NoiseGeneratorNode::NoiseType::Worley);
+            break;
+        } 
+        else {
+            std::cout << "Invalid noise type. Please try again." << std::endl;
+        }
+    }
+
+    while (true) {
+        std::cout << "Enter Scale (int): ";
+        std::cin >> scale;
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+            std::cout << "Invalid input for scale. Please enter an integer." << std::endl;
+        } else {
+            noiseNode->setScale(scale);
+            break;
+        }
+    }
+
+    while (true) {
+        std::cout << "Enter Octaves (int): ";
+        std::cin >> octaves;
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+            std::cout << "Invalid input for octaves. Please enter an integer." << std::endl;
+        } else {
+            noiseNode->setOctaves(octaves);
+            break;
+        }
+    }
+
+    while (true) {
+        std::cout << "Enter Persistence (float): ";
+        std::cin >> persistence;
+        if (std::cin.fail()) {
+            std::cin.clear(); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input for persistence. Please enter a floating-point number." << std::endl;
+        } else {
+            noiseNode->setPersistence(persistence);
+            break;
+        }
+    }
+
+    std::string usage;
+    while (true) {
+        std::cout << "Use noise as color or displacement? (c/d): ";
+        std::cin >> usage;
+        if (usage == "c" || usage == "C") {
+            noiseNode->setUseAsDisplacement(false);
+            break;
+        } else if (usage == "d" || usage == "D") {
+            noiseNode->setUseAsDisplacement(true);
+            break;
+        } else {
+            std::cout << "Invalid option. Please enter 'c' for color or 'd' for displacement." << std::endl;
+        }
+    }
+
+    noiseNode->process();
+
+    cv::Mat result = noiseNode->getOutput();
+    if (!result.empty()) {
+        std::string filename = usage == "d" ? "Displacement_Noise.png" : "Color_Noise.png";
+        cv::imwrite(filename, result);
+        std::cout << "Noise image saved as " << filename << std::endl;
+    } else {
+        std::cout << "Failed to generate noise." << std::endl;
     }
 }

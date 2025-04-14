@@ -6,23 +6,21 @@
 
 class Node {
 public:
-    std::string id;      // Unique identifier for the node
-    std::string name;    // User-defined name for the node
+    std::string id;     
+    std::string name;  
 
-    virtual void process() = 0;  // Perform image processing
-    virtual void renderUI() = 0;  // Render node-specific UI (ImGui)
-    virtual cv::Mat getOutput() const = 0;  // Get processed output
-    virtual void setInput(const cv::Mat& input) { this->input = input; }  // Set input for the node
+    virtual void process() = 0;  
+    virtual void renderUI() = 0;  
+    virtual cv::Mat getOutput() const = 0;  
+    virtual void setInput(const cv::Mat& input) { this->input = input; }  
 
-    // Optionally get the input image (if needed in subclasses or for debugging)
     cv::Mat getInput() const { return input; }
 
-    virtual ~Node() = default;  // Virtual destructor for proper cleanup
+    virtual ~Node() = default; 
 
 protected:
-    cv::Mat input;  // Store the input image for processing
+    cv::Mat input;  
 
-    // Optionally add a type or category to help classify the nodes
     enum class NodeType { Input, Processing, Output };
-    NodeType nodeType;  // Type of node (could be used for UI or internal classification)
+    NodeType nodeType; 
 };
