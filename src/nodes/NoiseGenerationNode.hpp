@@ -6,32 +6,38 @@
 #include <string>
 
 class NoiseGeneratorNode : public Node {
-    public:
-        enum class NoiseType { Perlin, Simplex, Worley };
-    
-        NoiseGeneratorNode(const std::string& id, const std::string& name);
-    
-        void setNoiseType(NoiseType type);
-        void setScale(float scale);
-        void setOctaves(int octaves);
-        void setPersistence(float persistence);
-        void setUseAsDisplacement(bool useAsDisplacement);
-    
-        void process() override;
-        void renderUI() override;
+public:
+    enum class NoiseType { Perlin, Simplex, Worley };
 
-        cv::Mat getOutput() const override;
-        void setInput(const cv::Mat& input) override;
-    private:
-        void generateNoise(); 
-    
-        NoiseType noiseType = NoiseType::Perlin;
-        float scale = 1.0f;
-        int octaves = 4;
-        float persistence = 0.5f;
-        bool useAsDisplacement = false;
-        cv::Mat inputImage;
-        cv::Mat output;
-    
-        FastNoiseLite fastNoiseLite;
-    };
+    NoiseGeneratorNode(const std::string& id, const std::string& name);
+
+    // Config setters
+    void setNoiseType(NoiseType type);
+    void setScale(float scale);               // Frequency of the noise
+    void setOctaves(int octaves);            // Number of fractal layers
+    void setPersistence(float persistence);  // Amplitude scaling across octaves
+    void setUseAsDisplacement(bool use);     // Enable displacement mode
+
+    void setInput(const cv::Mat& input) override;
+    cv::Mat getOutput() const override;
+
+    void process() override;
+    void renderUI() override;
+
+private:
+    void generateNoise();  // Generates procedural noise into `output`
+
+    // Parameters
+    NoiseType noiseType = NoiseType::Perlin;
+    float scale = 0.05f;
+    int octaves = 3;
+    float persistence = 0.5f;
+    bool useAsDisplacement = false;
+
+    // Internal state
+    cv::Mat inputImage;
+    cv::Mat output;
+
+    // Noise engine
+    FastNoiseLite fastNoiseLite;
+};
