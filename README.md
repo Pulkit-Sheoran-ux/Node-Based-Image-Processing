@@ -50,7 +50,7 @@ Here is the result of edge detection using the Sobel algorithm:
 
 ### Edge Detection (Canny)
 This is the result of Blend using multiply operation:
-![Blend](Blended_Images.png)
+![Blend](Blended_Image.png)
 
 ## Installation
 
