@@ -34,6 +34,24 @@ This is a node-based image manipulation framework implemented in C++. The system
 6. **Thresholding**: Convert the image into a binary image based on specified thresholding methods (e.g., Otsu's, binary, adaptive).
 7. **Blending**: Blend two images together using configurable parameters.
 
+## Example Images
+
+### Original Image
+Here is an example of the original image before any processing:
+![Original Image](b.jpg)
+
+### Grayscale Image
+After applying Directional Blur transformation:
+![Blurred Image](Blurred_Image.png)
+
+### Edge Detection (Sobel)
+Here is the result of edge detection using the Sobel algorithm:
+![Edge Detection Sobel](Soft_Edge_Detected_Image.png)
+
+### Edge Detection (Canny)
+This is the result of Blend using multiply operation:
+![Blend](Blended_Images.png)
+
 ## Installation
 
 ### Prerequisites

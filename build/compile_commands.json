@@ -1,0 +1,104 @@
+[
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\main.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\main.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/main.cpp",
+  "output": "CMakeFiles/main.dir/src/main.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\graph\\NodeGraph.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\graph\\NodeGraph.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/graph/NodeGraph.cpp",
+  "output": "CMakeFiles/main.dir/src/graph/NodeGraph.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\ImageInputNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\ImageInputNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/ImageInputNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/ImageInputNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\OutputNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\OutputNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/OutputNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/OutputNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\BrightnessContrastNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\BrightnessContrastNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/BrightnessContrastNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/BrightnessContrastNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\ColorChannelSplitterNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\ColorChannelSplitterNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/ColorChannelSplitterNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/ColorChannelSplitterNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\BlurNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\BlurNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/BlurNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/BlurNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\ThresholdNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\ThresholdNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/ThresholdNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/ThresholdNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\EdgeDetectionNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\EdgeDetectionNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/EdgeDetectionNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/EdgeDetectionNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\BlendNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\BlendNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/BlendNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/BlendNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\NoiseGenerationNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\NoiseGenerationNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/NoiseGenerationNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/NoiseGenerationNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\src\\nodes\\ConvolutionFilterNode.cpp.obj -c \"D:\\OneDrive\\OneDrive - IIT Delhi\\Documents\\GitHub\\Node-Based-Image-Processing\\src\\nodes\\ConvolutionFilterNode.cpp\"",
+  "file": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/src/nodes/ConvolutionFilterNode.cpp",
+  "output": "CMakeFiles/main.dir/src/nodes/ConvolutionFilterNode.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\D_\\Coding\\Node_Assignment\\libs\\imgui\\imgui.cpp.obj -c \"D:\\Coding\\Node Assignment\\libs\\imgui\\imgui.cpp\"",
+  "file": "D:/Coding/Node Assignment/libs/imgui/imgui.cpp",
+  "output": "CMakeFiles/main.dir/D_/Coding/Node_Assignment/libs/imgui/imgui.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\D_\\Coding\\Node_Assignment\\libs\\imgui\\imgui_draw.cpp.obj -c \"D:\\Coding\\Node Assignment\\libs\\imgui\\imgui_draw.cpp\"",
+  "file": "D:/Coding/Node Assignment/libs/imgui/imgui_draw.cpp",
+  "output": "CMakeFiles/main.dir/D_/Coding/Node_Assignment/libs/imgui/imgui_draw.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\D_\\Coding\\Node_Assignment\\libs\\imgui\\imgui_widgets.cpp.obj -c \"D:\\Coding\\Node Assignment\\libs\\imgui\\imgui_widgets.cpp\"",
+  "file": "D:/Coding/Node Assignment/libs/imgui/imgui_widgets.cpp",
+  "output": "CMakeFiles/main.dir/D_/Coding/Node_Assignment/libs/imgui/imgui_widgets.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\D_\\Coding\\Node_Assignment\\libs\\imgui\\imgui_tables.cpp.obj -c \"D:\\Coding\\Node Assignment\\libs\\imgui\\imgui_tables.cpp\"",
+  "file": "D:/Coding/Node Assignment/libs/imgui/imgui_tables.cpp",
+  "output": "CMakeFiles/main.dir/D_/Coding/Node_Assignment/libs/imgui/imgui_tables.cpp.obj"
+},
+{
+  "directory": "D:/OneDrive/OneDrive - IIT Delhi/Documents/GitHub/Node-Based-Image-Processing/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\main.dir\\D_\\Coding\\Node_Assignment\\libs\\imgui\\imgui_demo.cpp.obj -c \"D:\\Coding\\Node Assignment\\libs\\imgui\\imgui_demo.cpp\"",
+  "file": "D:/Coding/Node Assignment/libs/imgui/imgui_demo.cpp",
+  "output": "CMakeFiles/main.dir/D_/Coding/Node_Assignment/libs/imgui/imgui_demo.cpp.obj"
+}
+]
