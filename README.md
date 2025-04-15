@@ -70,7 +70,7 @@ This is the result of Blend using multiply operation:
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/node-based-image-manipulation.git
+    git clone https://github.com/Pulkit-Sheoran-ux/Node-Based-Image-Manipulation.git
     ```
 
 2. Install OpenCV and ImGui (either via package manager or build from source).
