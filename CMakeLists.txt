@@ -39,6 +39,7 @@ add_executable(main
     src/nodes/EdgeDetectionNode.cpp
     src/nodes/BlendNode.cpp
     src/nodes/NoiseGenerationNode.cpp
+    src/nodes/ConvolutionFilterNode.cpp
     ${IMGUI_SOURCES} 
 )
 

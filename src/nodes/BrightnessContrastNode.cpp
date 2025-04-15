@@ -33,7 +33,7 @@ void BrightnessContrastNode::process() {
         std::cerr << "No input image for BrightnessContrastNode: " << name << std::endl;
         return;
     }
-
+    
     inputImage.convertTo(outputImage, -1, alpha, beta);
     std::cout << "Applied Brightness/Contrast to: " << name << std::endl;
 }

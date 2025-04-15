@@ -11,29 +11,27 @@ class NoiseGeneratorNode : public Node {
     
         NoiseGeneratorNode(const std::string& id, const std::string& name);
     
-        // Configure noise parameters
         void setNoiseType(NoiseType type);
         void setScale(float scale);
         void setOctaves(int octaves);
         void setPersistence(float persistence);
         void setUseAsDisplacement(bool useAsDisplacement);
     
-        // Override methods
         void process() override;
         void renderUI() override;
+
         cv::Mat getOutput() const override;
-    
+        void setInput(const cv::Mat& input) override;
     private:
-        void generateNoise(); // Generates the noise pattern
+        void generateNoise(); 
     
-        NoiseType noiseType = NoiseType::Perlin; // Default noise type
+        NoiseType noiseType = NoiseType::Perlin;
         float scale = 1.0f;
         int octaves = 4;
         float persistence = 0.5f;
         bool useAsDisplacement = false;
+        cv::Mat inputImage;
+        cv::Mat output;
     
-        cv::Mat output; // The generated noise map
-    
-        // FastNoiseLite instance
         FastNoiseLite fastNoiseLite;
     };

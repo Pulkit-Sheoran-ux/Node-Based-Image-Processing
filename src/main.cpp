@@ -9,21 +9,24 @@
 #include "nodes/EdgeDetectionNode.hpp"
 #include "nodes/BlendNode.hpp"
 #include "nodes/NoiseGenerationNode.hpp"
+#include "nodes/ConvolutionFilterNode.hpp"
 #include <iostream>
 #include <imgui.h>
+#include <memory>
 
 void showMenu();
 void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded);
 void splitChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode, std::shared_ptr<ImageInputNode> &inputNode, bool &channelsSplit, bool imageLoaded);
 void convertToGrayscale(std::shared_ptr<ImageInputNode> &inputNode);
-void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, bool imageLoaded);
+void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, std::shared_ptr<ImageInputNode> &inputNode, bool imageLoaded);
 void saveOutputImage(std::shared_ptr<OutputNode> &outputNode, bool channelsSplit, std::shared_ptr<ImageInputNode> &inputNode, std::shared_ptr<ColorChannelSplitterNode> &splitterNode);
 void mergeChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode);
 void applyBlur(std::shared_ptr<BlurNode> &blurNode, std::shared_ptr<ImageInputNode> &inputNode);
 void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, std::shared_ptr<ImageInputNode> &inputNode);
 void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::shared_ptr<ImageInputNode> &inputNode);
 void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInputNode> &inputNode);
-void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode);
+void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, std::shared_ptr<ImageInputNode> &inputNode);
+void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, std::shared_ptr<ImageInputNode> &inputNode);
 
 int main()
 {
@@ -37,7 +40,8 @@ int main()
     auto thresholdNode = std::make_shared<ThresholdNode>("ThresholdNode");
     auto edgedetectionNode = std::make_shared<EdgeDetectionNode>("EdgeDetection");
     auto blendNode = std::make_shared<BlendNode>("Blend");
-    auto noiseNode = std::make_shared<NoiseGeneratorNode>("NoiseID","NoiseGenerator");
+    auto noiseNode = std::make_shared<NoiseGeneratorNode>("NoiseID", "NoiseGenerator");
+    auto convoNode = std::make_shared<ConvolutionFilterNode>("conv1", "ConvFilter");
 
     graph.addNode(inputNode);
     graph.addNode(splitterNode);
@@ -48,6 +52,7 @@ int main()
     graph.addNode(edgedetectionNode);
     graph.addNode(blendNode);
     graph.addNode(noiseNode);
+    graph.addNode(convoNode);
 
     int choice = 0;
     bool imageLoaded = false;
@@ -56,7 +61,7 @@ int main()
     while (true)
     {
         showMenu();
-        std::cout << "Enter your choice (1-12): ";
+        std::cout << "Enter your choice (1-13): ";
         std::cin >> choice;
 
         switch (choice)
@@ -71,7 +76,7 @@ int main()
             convertToGrayscale(inputNode);
             break;
         case 4:
-            adjustBrightnessContrast(bcNode, imageLoaded);
+            adjustBrightnessContrast(bcNode, inputNode, imageLoaded);
             break;
         case 5:
             saveOutputImage(outputNode, channelsSplit, inputNode, splitterNode);
@@ -92,9 +97,12 @@ int main()
             applyBlend(blendNode, inputNode);
             break;
         case 11:
-            applyNoise(noiseNode);
+            applyNoise(noiseNode, inputNode);
             break;
         case 12:
+            convolutionfilter(convoNode, inputNode);
+            break;
+        case 13:
             std::cout << "Exiting program." << std::endl;
             return 0;
         default:
@@ -119,7 +127,8 @@ void showMenu()
     std::cout << "9. Edge Detection" << std::endl;
     std::cout << "10. Blend Images" << std::endl;
     std::cout << "11. Generate Noise" << std::endl;
-    std::cout << "12. Exit" << std::endl;
+    std::cout << "12. Apply Convolution Noise" << std::endl;
+    std::cout << "13. Exit" << std::endl;
 }
 
 void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded)
@@ -127,15 +136,28 @@ void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded)
     if (!imageLoaded)
     {
         std::string imagename;
-        std::cout << "Enter the image file name: ";
         std::string s = "../assets/";
-        std::cin >> imagename;
-        std::string imagePath = s + imagename;
 
-        inputNode = std::make_shared<ImageInputNode>("MyImage", imagePath);
-        inputNode->process();
-        std::cout << "Image loaded successfully!" << std::endl;
-        imageLoaded = true;
+        while (true)
+        {
+            std::cout << "Enter the image file name: ";
+            std::cin >> imagename;
+            std::string imagePath = s + imagename;
+
+            cv::Mat img = cv::imread(imagePath, cv::IMREAD_COLOR);
+            if (img.empty())
+            {
+                std::cout << "Error: Image not found or could not be loaded. Please try again.\n";
+            }
+            else
+            {
+                inputNode = std::make_shared<ImageInputNode>("MyImage", imagePath);
+                inputNode->process();
+                std::cout << "Image loaded successfully!" << std::endl;
+                imageLoaded = true;
+                break;
+            }
+        }
     }
     else
     {
@@ -167,10 +189,11 @@ void convertToGrayscale(std::shared_ptr<ImageInputNode> &inputNode)
     inputNode->convertToGrayscale();
 }
 
-void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, bool imageLoaded)
+void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, std::shared_ptr<ImageInputNode> &inputNode, bool imageLoaded)
 {
     if (imageLoaded)
     {
+        bcNode->setInput(inputNode->getOutput());
         float alpha, beta;
         std::cout << "Enter contrast (alpha) value (1.0 is normal): ";
         std::cin >> alpha;
@@ -179,7 +202,14 @@ void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, b
         bcNode->setParams(alpha, beta);
         bcNode->process();
         std::cout << "Brightness and contrast adjusted." << std::endl;
+        cv::Mat out = bcNode->getOutput();
+        if (!out.empty())
+        {
+            cv::imwrite("Bright.png", out);
+            std::cout << "Bright image saved." << std::endl;
+        }
     }
+
     else
     {
         std::cout << "Please load an image first." << std::endl;
@@ -367,10 +397,10 @@ void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::share
 void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInputNode> &inputNode)
 {
     std::string secondImageName;
-    std::cout << "Enter filename of second image (in ../assets/): ";
+    std::cout << "Enter path of second image: ";
     std::cin >> secondImageName;
 
-    std::shared_ptr<ImageInputNode> secondInput = std::make_shared<ImageInputNode>("SecondImage", "../assets/" + secondImageName);
+    std::shared_ptr<ImageInputNode> secondInput = std::make_shared<ImageInputNode>("SecondImage", secondImageName);
     secondInput->process();
 
     blendNode->setInputA(inputNode->getOutput());
@@ -421,81 +451,105 @@ void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInpu
     }
 }
 
-void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode) {
+void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, std::shared_ptr<ImageInputNode> &inputNode)
+{
     std::string type;
-    int scale, octaves;
-    float persistence;
-
-    while (true) {
+    int octaves;
+    float persistence, scale;
+    noiseNode->setInput(inputNode->getOutput());
+    while (true)
+    {
         std::cout << "Enter Noise Type (perlin/simplex/worley): ";
         std::cin >> type;
-        if (type == "perlin") {
+        if (type == "perlin")
+        {
             noiseNode->setNoiseType(NoiseGeneratorNode::NoiseType::Perlin);
             break;
-        } 
-        else if (type == "simplex") {
+        }
+        else if (type == "simplex")
+        {
             noiseNode->setNoiseType(NoiseGeneratorNode::NoiseType::Simplex);
             break;
-        } 
-        else if (type == "worley") {
+        }
+        else if (type == "worley")
+        {
             noiseNode->setNoiseType(NoiseGeneratorNode::NoiseType::Worley);
             break;
-        } 
-        else {
+        }
+        else
+        {
             std::cout << "Invalid noise type. Please try again." << std::endl;
         }
     }
 
-    while (true) {
-        std::cout << "Enter Scale (int): ";
+    while (true)
+    {
+        std::cout << "Enter Scale (float): ";
         std::cin >> scale;
-        if (std::cin.fail()) {
+        if (std::cin.fail())
+        {
             std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid input for scale. Please enter an integer." << std::endl;
-        } else {
+        }
+        else
+        {
             noiseNode->setScale(scale);
             break;
         }
     }
 
-    while (true) {
+    while (true)
+    {
         std::cout << "Enter Octaves (int): ";
         std::cin >> octaves;
-        if (std::cin.fail()) {
+        if (std::cin.fail())
+        {
             std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); 
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid input for octaves. Please enter an integer." << std::endl;
-        } else {
+        }
+        else
+        {
             noiseNode->setOctaves(octaves);
             break;
         }
     }
 
-    while (true) {
+    while (true)
+    {
         std::cout << "Enter Persistence (float): ";
         std::cin >> persistence;
-        if (std::cin.fail()) {
-            std::cin.clear(); 
+        if (std::cin.fail())
+        {
+            std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid input for persistence. Please enter a floating-point number." << std::endl;
-        } else {
+        }
+        else
+        {
             noiseNode->setPersistence(persistence);
             break;
         }
     }
 
     std::string usage;
-    while (true) {
+    while (true)
+    {
         std::cout << "Use noise as color or displacement? (c/d): ";
         std::cin >> usage;
-        if (usage == "c" || usage == "C") {
+        if (usage == "c" || usage == "C")
+        {
             noiseNode->setUseAsDisplacement(false);
             break;
-        } else if (usage == "d" || usage == "D") {
+        }
+        else if (usage == "d" || usage == "D")
+        {
             noiseNode->setUseAsDisplacement(true);
             break;
-        } else {
+        }
+        else
+        {
             std::cout << "Invalid option. Please enter 'c' for color or 'd' for displacement." << std::endl;
         }
     }
@@ -503,11 +557,75 @@ void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode) {
     noiseNode->process();
 
     cv::Mat result = noiseNode->getOutput();
-    if (!result.empty()) {
+    if (!result.empty())
+    {
+        cv::Mat displayResult;
+        result.convertTo(displayResult, CV_8U, 255.0);
+
         std::string filename = usage == "d" ? "Displacement_Noise.png" : "Color_Noise.png";
-        cv::imwrite(filename, result);
+        cv::imwrite(filename, displayResult);
         std::cout << "Noise image saved as " << filename << std::endl;
-    } else {
+    }
+    else
+    {
         std::cout << "Failed to generate noise." << std::endl;
     }
 }
+
+void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, std::shared_ptr<ImageInputNode> &inputNode)
+{
+    convoNode->setInput(inputNode->getOutput());
+
+    std::cout << "Choose a preset filter:\n";
+    std::cout << "1. Sharpen\n2. Emboss\n3. Edge Enhance\n4. Custom\n";
+    int choice;
+    std::cin >> choice;
+
+    switch (choice)
+    {
+    case 1:
+        convoNode->setPreset(ConvolutionFilterNode::PresetType::Sharpen);
+        break;
+    case 2:
+        convoNode->setPreset(ConvolutionFilterNode::PresetType::Emboss);
+        break;
+    case 3:
+        convoNode->setPreset(ConvolutionFilterNode::PresetType::EdgeEnhance);
+        break;
+    case 4:
+    {
+        int kernelSize;
+        std::cout << "Enter kernel size (3 or 5): ";
+        std::cin >> kernelSize;
+        if (kernelSize == 3 || kernelSize == 5)
+        {
+            std::vector<float> customKernel(kernelSize * kernelSize);
+            std::cout << "Enter the values for the " << kernelSize << "x" << kernelSize << " kernel:\n";
+            for (int i = 0; i < kernelSize * kernelSize; ++i)
+            {
+                std::cin >> customKernel[i];
+            }
+            convoNode->setCustomKernel(customKernel);
+        }
+        else
+        {
+            std::cout << "Invalid kernel size. Defaulting to sharpen filter.\n";
+            convoNode->setPreset(ConvolutionFilterNode::PresetType::Sharpen);
+        }
+    }
+    break;
+    default:
+        std::cout << "Invalid choice! Defaulting to sharpen filter.\n";
+        convoNode->setPreset(ConvolutionFilterNode::PresetType::Sharpen);
+        break;
+    }
+
+    convoNode->process();
+    cv::Mat result = convoNode->getOutput();
+    cv::imshow("Convolution Filter Effect", result);
+    cv::waitKey(0);
+
+    std::cout << "Filter applied! Saving the output image...\n";
+    cv::imwrite("Filtered_Output.png", convoNode->getOutput());
+}
+
