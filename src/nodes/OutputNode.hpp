@@ -18,4 +18,5 @@ public:
     void process() override;
     void renderUI() override;
     cv::Mat getOutput() const override;
+    void settype(std::string type);
 };

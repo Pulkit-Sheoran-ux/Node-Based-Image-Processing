@@ -64,18 +64,16 @@ void EdgeDetectionNode::process()
         return;
     }
 
-    // Clone the original image to ensure we keep the color version 🎨
     cv::Mat originalColor = inputImage.clone();
 
     cv::Mat grayImage;
-    // Convert to grayscale if needed
     if (inputImage.channels() != 1)
     {
         cv::cvtColor(inputImage, grayImage, cv::COLOR_BGR2GRAY);
     }
     else
     {
-        grayImage = inputImage; // already grayscale
+        grayImage = inputImage;
     }
 
     cv::Mat edges;
@@ -91,9 +89,7 @@ void EdgeDetectionNode::process()
     if (overlayEdges)
     {
         cv::Mat colorEdges;
-        // Convert edges to BGR so they match the original color image channels ✅
         cv::cvtColor(edges, colorEdges, cv::COLOR_GRAY2BGR);
-        // Blend the images; originalColor is in color and colorEdges is in BGR
         cv::addWeighted(originalColor, 0.7, colorEdges, 0.3, 0, outputImage);
     }
     else

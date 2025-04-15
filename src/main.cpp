@@ -15,18 +15,19 @@
 #include <memory>
 
 void showMenu();
-void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded);
-void splitChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode, std::shared_ptr<ImageInputNode> &inputNode, bool &channelsSplit, bool imageLoaded);
-void convertToGrayscale(std::shared_ptr<ImageInputNode> &inputNode);
-void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, std::shared_ptr<ImageInputNode> &inputNode, bool imageLoaded);
-void saveOutputImage(std::shared_ptr<OutputNode> &outputNode, bool channelsSplit, std::shared_ptr<ImageInputNode> &inputNode, std::shared_ptr<ColorChannelSplitterNode> &splitterNode);
+void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded, cv::Mat &currentImage);
+void splitChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode, cv::Mat &currentImage, cv::Mat &previousImage, bool &channelsSplit, bool imageLoaded);
+void convertToGrayscale(cv::Mat &currentImage, cv::Mat &previousImage);
+void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, bool imageLoaded, cv::Mat &currentImage, cv::Mat &previousImage);
+void saveOutputImage(std::shared_ptr<OutputNode> &outputNode, cv::Mat &curr);
 void mergeChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode);
-void applyBlur(std::shared_ptr<BlurNode> &blurNode, std::shared_ptr<ImageInputNode> &inputNode);
-void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, std::shared_ptr<ImageInputNode> &inputNode);
-void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::shared_ptr<ImageInputNode> &inputNode);
-void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInputNode> &inputNode);
+void applyBlur(std::shared_ptr<BlurNode> &blurNode, cv::Mat &currentImage, cv::Mat &previousImage);
+void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, cv::Mat &currentImage, cv::Mat &previousImage);
+void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, cv::Mat &currentImage, cv::Mat &previousImage);
+void applyBlend(std::shared_ptr<BlendNode> &blendNode, cv::Mat &currentImage, cv::Mat &previousImage);
 void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, std::shared_ptr<ImageInputNode> &inputNode);
-void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, std::shared_ptr<ImageInputNode> &inputNode);
+void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, cv::Mat &currentImage, cv::Mat &previousImage);
+void showcurrentimage(cv::Mat &currentImage);
 
 int main()
 {
@@ -57,52 +58,59 @@ int main()
     int choice = 0;
     bool imageLoaded = false;
     bool channelsSplit = false;
-
+    cv::Mat currentImage, previousImage;
     while (true)
     {
         showMenu();
-        std::cout << "Enter your choice (1-13): ";
+        std::cout << "Enter your choice (1-15): ";
         std::cin >> choice;
 
         switch (choice)
         {
         case 1:
-            loadImage(inputNode, imageLoaded);
+            loadImage(inputNode, imageLoaded, currentImage);
             break;
         case 2:
-            splitChannels(splitterNode, inputNode, channelsSplit, imageLoaded);
+            splitChannels(splitterNode, currentImage, previousImage, channelsSplit, imageLoaded);
             break;
         case 3:
-            convertToGrayscale(inputNode);
+            convertToGrayscale(currentImage, previousImage);
             break;
         case 4:
-            adjustBrightnessContrast(bcNode, inputNode, imageLoaded);
+            adjustBrightnessContrast(bcNode, imageLoaded, currentImage, previousImage);
             break;
         case 5:
-            saveOutputImage(outputNode, channelsSplit, inputNode, splitterNode);
+            saveOutputImage(outputNode, currentImage);
             break;
         case 6:
             mergeChannels(splitterNode);
             break;
         case 7:
-            applyBlur(blurNode, inputNode);
+            applyBlur(blurNode, currentImage, previousImage);
             break;
         case 8:
-            applyThreshold(thresholdNode, inputNode);
+            applyThreshold(thresholdNode, currentImage, previousImage);
             break;
         case 9:
-            applyEdgeDetection(edgedetectionNode, inputNode);
+            applyEdgeDetection(edgedetectionNode, currentImage, previousImage);
             break;
         case 10:
-            applyBlend(blendNode, inputNode);
+            applyBlend(blendNode, currentImage, previousImage);
             break;
         case 11:
             applyNoise(noiseNode, inputNode);
             break;
         case 12:
-            convolutionfilter(convoNode, inputNode);
+            convolutionfilter(convoNode, currentImage, previousImage);
             break;
         case 13:
+            showcurrentimage(currentImage);
+            break;
+        case 14:
+            std::cout << "Undo Done" << std::endl;
+            currentImage = previousImage;
+            break;
+        case 15:
             std::cout << "Exiting program." << std::endl;
             return 0;
         default:
@@ -127,11 +135,26 @@ void showMenu()
     std::cout << "9. Edge Detection" << std::endl;
     std::cout << "10. Blend Images" << std::endl;
     std::cout << "11. Generate Noise" << std::endl;
-    std::cout << "12. Apply Convolution Noise" << std::endl;
-    std::cout << "13. Exit" << std::endl;
+    std::cout << "12. Apply Convolution Filter" << std::endl;
+    std::cout << "13. See Current Image." << std::endl;
+    std::cout << "14. Undo Image (only 1 step)" << std::endl;
+    std::cout << "15. Exit" << std::endl;
 }
 
-void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded)
+void showcurrentimage(cv::Mat &currentImage)
+{
+    if (!currentImage.empty())
+    {
+        cv::imshow("Current Image", currentImage);
+        cv::waitKey(0);
+    }
+    else
+    {
+        std::cout << "No Image Loaded." << std::endl;
+    }
+}
+
+void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded, cv::Mat &currentImage)
 {
     if (!imageLoaded)
     {
@@ -158,6 +181,7 @@ void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded)
                 break;
             }
         }
+        currentImage = inputNode->getOutput();
     }
     else
     {
@@ -165,11 +189,12 @@ void loadImage(std::shared_ptr<ImageInputNode> &inputNode, bool &imageLoaded)
     }
 }
 
-void splitChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode, std::shared_ptr<ImageInputNode> &inputNode, bool &channelsSplit, bool imageLoaded)
+void splitChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode, cv::Mat &currentImage, cv::Mat &previousImage, bool &channelsSplit, bool imageLoaded)
 {
+    previousImage = currentImage;
     if (imageLoaded && !channelsSplit)
     {
-        splitterNode->setInput(inputNode->getOutput());
+        splitterNode->setInput(currentImage);
         splitterNode->process();
         std::cout << "Color channels split successfully!" << std::endl;
         channelsSplit = true;
@@ -184,16 +209,20 @@ void splitChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode, std:
     }
 }
 
-void convertToGrayscale(std::shared_ptr<ImageInputNode> &inputNode)
+void convertToGrayscale(cv::Mat &currentImage, cv::Mat &previousImage)
 {
-    inputNode->convertToGrayscale();
+    previousImage = currentImage;
+    cv::Mat output;
+    cv::cvtColor(currentImage, output, cv::COLOR_BGR2GRAY);
+    currentImage = output;
 }
 
-void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, std::shared_ptr<ImageInputNode> &inputNode, bool imageLoaded)
+void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, bool imageLoaded, cv::Mat &currentImage, cv::Mat &previousImage)
 {
+    previousImage = currentImage;
     if (imageLoaded)
     {
-        bcNode->setInput(inputNode->getOutput());
+        bcNode->setInput(currentImage);
         float alpha, beta;
         std::cout << "Enter contrast (alpha) value (1.0 is normal): ";
         std::cin >> alpha;
@@ -216,17 +245,21 @@ void adjustBrightnessContrast(std::shared_ptr<BrightnessContrastNode> &bcNode, s
     }
 }
 
-void saveOutputImage(std::shared_ptr<OutputNode> &outputNode, bool channelsSplit, std::shared_ptr<ImageInputNode> &inputNode, std::shared_ptr<ColorChannelSplitterNode> &splitterNode)
+void saveOutputImage(std::shared_ptr<OutputNode> &outputNode, cv::Mat &currentImage)
 {
-    if (!channelsSplit)
+    if (!currentImage.empty())
     {
-        outputNode->setInput(inputNode->getOutput());
+        std::cout << "Please Specify Image type: (jpg/png/jpeg)";
+        std::string type;
+        std::cin >> type;
+        outputNode->settype(type);
+        outputNode->setInput(currentImage);
         outputNode->process();
-        std::cout << "Output image saved (adjusted brightness/contrast)." << std::endl;
+        std::cout << "Output image saved." << std::endl;
     }
     else
     {
-        std::cout << "Please split the color channels first to save specific channels." << std::endl;
+        std::cout << "No Image Loaded." << std::endl;
     }
 }
 
@@ -244,9 +277,10 @@ void mergeChannels(std::shared_ptr<ColorChannelSplitterNode> &splitterNode)
     }
 }
 
-void applyBlur(std::shared_ptr<BlurNode> &blurNode, std::shared_ptr<ImageInputNode> &inputNode)
+void applyBlur(std::shared_ptr<BlurNode> &blurNode, cv::Mat &currentImage, cv::Mat &previousImage)
 {
-    blurNode->setInput(inputNode->getOutput());
+    previousImage = currentImage;
+    blurNode->setInput(currentImage);
     std::cout << "What type blur you require? (D/G)" << std::endl;
     std::string blurtype;
     std::cin >> blurtype;
@@ -285,9 +319,10 @@ void applyBlur(std::shared_ptr<BlurNode> &blurNode, std::shared_ptr<ImageInputNo
     }
 }
 
-void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, std::shared_ptr<ImageInputNode> &inputNode)
+void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, cv::Mat &currentImage, cv::Mat &previousImage)
 {
-    thresholdNode->setInput(inputNode->getOutput());
+    previousImage = currentImage;
+    thresholdNode->setInput(currentImage);
     std::cout << "Which type of Threhold you want? (B/A/O)" << std::endl;
     std::string thresholdtype;
     std::cin >> thresholdtype;
@@ -306,8 +341,8 @@ void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, std::shared_p
 
     thresholdNode->process();
 
-    cv::Mat thresholdedImage = thresholdNode->getOutput();
-    cv::Mat originalImage = inputNode->getOutput();
+    cv::Mat originalImage = currentImage;
+    currentImage = thresholdNode->getOutput();
 
     if (originalImage.channels() != 1)
     {
@@ -315,12 +350,11 @@ void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, std::shared_p
     }
 
     cv::imshow("Original Image", originalImage);
-    cv::imshow("Thresholded Image", thresholdedImage);
+    cv::imshow("Thresholded Image", currentImage);
     cv::waitKey(0);
     cv::Mat diffImage;
-    cv::absdiff(originalImage, thresholdedImage, diffImage);
+    cv::absdiff(originalImage, currentImage, diffImage);
 
-    // Show the difference image
     cv::imshow("Difference Image", diffImage);
     cv::waitKey(0);
 
@@ -329,9 +363,10 @@ void applyThreshold(std::shared_ptr<ThresholdNode> &thresholdNode, std::shared_p
     std::cout << "Difference image saved." << std::endl;
 }
 
-void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::shared_ptr<ImageInputNode> &inputNode)
+void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, cv::Mat &currentImage, cv::Mat &previousImage)
 {
-    edgeNode->setInput(inputNode->getOutput());
+    previousImage = currentImage;
+    edgeNode->setInput(currentImage);
     std::cout << "Give type of Edge Detection Algorithm. (Sobel/Canny)" << std::endl;
     std::string Algotype;
     std::cin >> Algotype;
@@ -373,19 +408,19 @@ void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::share
 
     edgeNode->process();
 
-    cv::Mat edgeDetectedImage = edgeNode->getOutput();
+    currentImage = edgeNode->getOutput();
 
-    if (!edgeDetectedImage.empty())
+    if (!currentImage.empty())
     {
-        cv::GaussianBlur(edgeDetectedImage, edgeDetectedImage, cv::Size(5, 5), 0);
-        // cv::bitwise_not(edgeDetectedImage, edgeDetectedImage);
-        cv::imwrite("Soft_Edge_Detected_Image.png", edgeDetectedImage);
+        cv::GaussianBlur(currentImage, currentImage, cv::Size(5, 5), 0);
+        // cv::bitwise_not(currentImage, currentImage);
+        cv::imwrite("Soft_Edge_Detected_Image.png", currentImage);
         std::cout << "Edge detection applied, softened";
         if (overlay)
             std::cout << ", overlaid";
         std::cout << ", and saved as Soft_Edge_Detected_Image.png." << std::endl;
 
-        cv::imshow("Final Edge Detected Image", edgeDetectedImage);
+        cv::imshow("Final Edge Detected Image", currentImage);
         cv::waitKey(0);
     }
     else
@@ -394,8 +429,9 @@ void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, std::share
     }
 }
 
-void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInputNode> &inputNode)
+void applyBlend(std::shared_ptr<BlendNode> &blendNode, cv::Mat &currentImage, cv::Mat &previousImage)
 {
+    previousImage = currentImage;
     std::string secondImageName;
     std::cout << "Enter path of second image: ";
     std::cin >> secondImageName;
@@ -403,7 +439,7 @@ void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInpu
     std::shared_ptr<ImageInputNode> secondInput = std::make_shared<ImageInputNode>("SecondImage", secondImageName);
     secondInput->process();
 
-    blendNode->setInputA(inputNode->getOutput());
+    blendNode->setInputA(currentImage);
     blendNode->setInputB(secondInput->getOutput());
 
     std::string blendMode;
@@ -437,12 +473,12 @@ void applyBlend(std::shared_ptr<BlendNode> &blendNode, std::shared_ptr<ImageInpu
 
     blendNode->process();
 
-    cv::Mat blendedImage = blendNode->getOutput();
-    if (!blendedImage.empty())
+    currentImage = blendNode->getOutput();
+    if (!currentImage.empty())
     {
-        cv::imwrite("Blended_Image.png", blendedImage);
+        cv::imwrite("Blended_Image.png", currentImage);
         std::cout << "Blended image saved as Blended_Image.png" << std::endl;
-        cv::imshow("Blended Image", blendedImage);
+        cv::imshow("Blended Image", currentImage);
         cv::waitKey(0);
     }
     else
@@ -572,9 +608,10 @@ void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, std::shared_ptr<
     }
 }
 
-void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, std::shared_ptr<ImageInputNode> &inputNode)
+void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, cv::Mat &currentImage, cv::Mat &previousImage)
 {
-    convoNode->setInput(inputNode->getOutput());
+    previousImage = currentImage;
+    convoNode->setInput(currentImage);
 
     std::cout << "Choose a preset filter:\n";
     std::cout << "1. Sharpen\n2. Emboss\n3. Edge Enhance\n4. Custom\n";
@@ -621,11 +658,10 @@ void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, std::s
     }
 
     convoNode->process();
-    cv::Mat result = convoNode->getOutput();
-    cv::imshow("Convolution Filter Effect", result);
+    currentImage = convoNode->getOutput();
+    cv::imshow("Convolution Filter Effect", currentImage);
     cv::waitKey(0);
 
     std::cout << "Filter applied! Saving the output image...\n";
-    cv::imwrite("Filtered_Output.png", convoNode->getOutput());
+    cv::imwrite("Filtered_Output.png", currentImage);
 }
-

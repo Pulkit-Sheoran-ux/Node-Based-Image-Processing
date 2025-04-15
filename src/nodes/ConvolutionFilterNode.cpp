@@ -82,9 +82,9 @@ void ConvolutionFilterNode::loadPreset(PresetType type)
     case PresetType::EdgeEnhance:
         kernelSize = 3;
         kernelData = {
-            0, 0, 0,
-            -1, 1, 0,
-            0, 0, 0};
+            0, -1, 0,
+            -1, 5, -1,
+            0, -1, 0};
         break;
     default:
         break;

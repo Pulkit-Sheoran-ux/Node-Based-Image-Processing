@@ -69,3 +69,7 @@ void OutputNode::renderUI() {
 cv::Mat OutputNode::getOutput() const {
     return inputImage;
 }
+
+void OutputNode::settype(std::string stype){
+    this->type = stype;
+}
