@@ -52,7 +52,7 @@ void applyEdgeDetection(std::shared_ptr<EdgeDetectionNode> &edgeNode, cv::Mat &c
 void applyBlend(std::shared_ptr<BlendNode> &blendNode, cv::Mat &currentImage, cv::Mat &previousImage);
 
 // Function to apply procedural noise (e.g., Perlin, Simplex) to the image, generating a noise pattern.
-void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, std::shared_ptr<ImageInputNode> &inputNode);
+void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, cv::Mat &currentImage,cv::Mat &previousImage);
 
 // Function to apply a convolution filter to the image. This allows for edge detection, sharpening, etc.
 void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, cv::Mat &currentImage, cv::Mat &previousImage);
@@ -137,7 +137,7 @@ int main()
             applyBlend(blendNode, currentImage, previousImage); // Apply image blending
             break;
         case 11:
-            applyNoise(noiseNode, inputNode); // Add noise to the image
+            applyNoise(noiseNode, currentImage,previousImage); // Add noise to the image
             break;
         case 12:
             convolutionfilter(convoNode, currentImage, previousImage); // Apply a convolution filter
@@ -686,15 +686,16 @@ void applyBlend(std::shared_ptr<BlendNode> &blendNode, cv::Mat &currentImage, cv
     }
 }
 
-// Function to apply noise to an image using the specified noise type and parameters
-void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, std::shared_ptr<ImageInputNode> &inputNode)
+//
+void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, cv::Mat &currentImage,cv::Mat &previousImage)
 {
+    previousImage = currentImage;
     std::string type;
     int octaves;
     float persistence, scale;
 
     // Set the input image for the noise generator node
-    noiseNode->setInput(inputNode->getOutput());
+    noiseNode->setInput(currentImage);
 
     // Ask the user for the noise type (Perlin, Simplex, or Worley)
     while (true)
@@ -802,17 +803,24 @@ void applyNoise(std::shared_ptr<NoiseGeneratorNode> &noiseNode, std::shared_ptr<
     noiseNode->process();
 
     // Get the output of the noise generation
-    cv::Mat result = noiseNode->getOutput();
-    if (!result.empty())
+    currentImage = noiseNode->getOutput();
+    if (!currentImage.empty())
     {
-        // Convert the result to 8-bit format for saving/display
+        // Convert the result to 8-bit format for saving/display if needed
         cv::Mat displayResult;
-        result.convertTo(displayResult, CV_8U, 255.0);
+        if (currentImage.type() == CV_32F || currentImage.type() == CV_32FC1 || currentImage.type() == CV_32FC3)
+            currentImage.convertTo(displayResult, CV_8U, 255.0);
+        else
+            displayResult = currentImage.clone();
 
-        // Save the noise image based on the usage (color or displacement)
+        // Save and show the noise image
         std::string filename = usage == "d" ? "Displacement_Noise.png" : "Color_Noise.png";
         cv::imwrite(filename, displayResult);
         std::cout << "Noise image saved as " << filename << std::endl;
+
+        cv::imshow("Generated Noise", displayResult);
+        cv::waitKey(0);
+        cv::destroyAllWindows();
     }
     else
     {
@@ -885,4 +893,3 @@ void convolutionfilter(std::shared_ptr<ConvolutionFilterNode> &convoNode, cv::Ma
     std::cout << "Filter applied! Saving the output image...\n";
     cv::imwrite("Filtered_Output.png", currentImage); // Save the image as "Filtered_Output.png"
 }
-

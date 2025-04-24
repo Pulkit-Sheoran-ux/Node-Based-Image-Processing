@@ -105,12 +105,13 @@ void NoiseGeneratorNode::generateNoise() {
         for (int x = 0; x < width; ++x) {
             float nx = static_cast<float>(x);
             float ny = static_cast<float>(y);
-            float noiseVal = fastNoiseLite.GetNoise(nx, ny);
-            output.at<float>(y, x) = noiseVal;
+            float noiseVal = fastNoiseLite.GetNoise(nx, ny);  // [-1, 1]
+            output.at<float>(y, x) = (noiseVal + 1.0f) / 2.0f; // [0, 1]
         }
     }
 
-    cv::normalize(output, output, 0.0f, 1.0f, cv::NORM_MINMAX);
+    // Don't normalize here since we already mapped to [0, 1]
+    // cv::normalize(output, output, 0.0f, 1.0f, cv::NORM_MINMAX);
 }
 
 cv::Mat NoiseGeneratorNode::getOutput() const {
